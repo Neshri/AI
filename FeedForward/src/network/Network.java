@@ -9,7 +9,7 @@ public class Network {
 
 	// input i to neuron j(has function g) weight is
 	// w = a(target-actual)*g'(sum)*x_i
-	
+
 	public static final DecimalFormat FORMAT = new DecimalFormat("#.###");
 
 	private Inputs in;
@@ -17,7 +17,7 @@ public class Network {
 	private PerceptronLayer[] layers;
 	private IDFactory idFact;
 
-	public Network(int input, int output, int layerWidth, int layers) {
+	public Network(String[] input, String[] output, int layerWidth, int layers) {
 		idFact = new IDFactory();
 		in = new Inputs(idFact, input);
 		out = new Outputs(idFact, output);
@@ -31,12 +31,20 @@ public class Network {
 		}
 		connectLayers(this.layers[layers - 1], out);
 	}
-	
+
 	public void fire() {
 		for (PerceptronLayer a : layers) {
 			a.fire();
 		}
 		out.fire();
+	}
+	
+	public void train(double[] in, double[] target) {
+		if (in.length != this.in.getNodes().length || out.getNodes().length != target.length) {
+			System.out.println("Invalid  training set.");
+		} else {
+			
+		}
 	}
 
 	private void connectLayers(Layer a, Layer b) {
@@ -73,11 +81,11 @@ public class Network {
 	}
 
 	public static void main(String[] args) {
-		Network n = new Network(2, 1, 2, 2);
+		Network n = new Network(null, null, 2, 2);
 		Input[] ins = n.getInputs();
 		Output[] outs = n.getOutputs();
 		for (int i = 0; i < 100; i++) {
-			System.out.println(n.toString()+"\n\n");
+			System.out.println(n.toString() + "\n\n");
 			for (Input a : ins) {
 				a.setValue(i);
 			}

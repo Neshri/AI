@@ -10,10 +10,12 @@ public class Outputs implements Layer {
 		private double value;
 		private ArrayList<Link> in = new ArrayList<Link>();
 		private long ID;
+		private String name;
 		private Function activation;
 
-		public Output(long ID, Function act) {
+		public Output(long ID, String name, Function act) {
 			this.ID = ID;
+			this.name = name;
 			if (act != null)
 				activation = act;
 			else
@@ -48,14 +50,19 @@ public class Outputs implements Layer {
 		public long getID() {
 			return ID;
 		}
+		
+		@Override
+		public String getName() {
+			return name;
+		}
 	}
 
 	private Output[] out;
 
-	public Outputs(IDFactory idFact, int n) {
-		out = new Output[n];
-		for (int i = 0; i < n; i++) {
-			out[i] = new Output(idFact.getID(), new Sigmoid());
+	public Outputs(IDFactory idFact, String[] names) {
+		out = new Output[names.length];
+		for (int i = 0; i < names.length; i++) {
+			out[i] = new Output(idFact.getID(), names[i], new Sigmoid());
 		}
 	}
 

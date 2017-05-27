@@ -43,6 +43,11 @@ public class Perceptron implements Node {
 	public long getID() {
 		return ID;
 	}
+	
+	@Override
+	public String getName() {
+		return "";
+	}
 
 	@Override
 	public String toString() {
