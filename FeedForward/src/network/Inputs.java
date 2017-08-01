@@ -6,21 +6,17 @@ public class Inputs implements Layer {
 
 	public static class Input implements Node {
 
-		private long ID;
-		private String name;
+		private int ID;
 		private double value;
 		private ArrayList<Link> list = new ArrayList<Link>();
 
-		public Input(long ID, String name) {
+		public Input(int ID) {
 			this.ID = ID;
-			this.name = name;
 		}
-		
+
 		public void setValue(double v) {
 			value = v;
-			for (Link a : list) {
-				a.value = value;
-			}
+			fire();
 		}
 
 		@Override
@@ -34,30 +30,61 @@ public class Inputs implements Layer {
 
 		@Override
 		public String toString() {
-			return ""+Network.FORMAT.format(value);
+			String str = "Input:" + ID + " v" + Network.FORMAT.format(value) + "\n";
+			for (Link a : list) {
+				str += a.toString() + "\n";
+			}
+			return str;
 		}
 
 		@Override
-		public long getID() {
+		public int getID() {
 			return ID;
 		}
-		
+
 		@Override
-		public String getName() {
-			return name;
+		public void fire() {
+			for (Link a : list) {
+				a.value = value;
+			}
 		}
-		
+
+		@Override
+		public void backPropagate(double learningRate) {
+			// Do nothing
+		}
+
+		@Override
+		public int getNbrOutput() {
+			return list.size();
+		}
+
+		@Override
+		public String[] getOutputLinkWeights() {
+			String[] send = new String[list.size()];
+			for (int i = 0; i < send.length; i++) {
+				send[i] = list.get(i).getID() + " " + list.get(i).weight;
+			}
+			return send;
+		}
+
 	}
 
 	private Input[] in;
 
-	public Inputs(IDFactory idFact, String[] name) {
-		in = new Input[name.length];
-		for (int i = 0; i < name.length; i++) {
-			in[i] = new Input(idFact.getID(), name[i]);
+	public Inputs(IDFactory idFact, int n) {
+		in = new Input[n];
+		for (int i = 0; i < n; i++) {
+			in[i] = new Input(idFact.getID());
 		}
 	}
 
+	public Inputs(int[] IDs) {
+		in = new Input[IDs.length];
+		for (int i = 0; i < IDs.length; i++) {
+			in[i] = new Input(IDs[i]);
+		}
+	}
 
 	@Override
 	public Node[] getNodes() {
@@ -68,9 +95,21 @@ public class Inputs implements Layer {
 	public String toString() {
 		String str = "";
 		for (Input a : in) {
-			str += a.toString() + " ";
+			str += a.toString() + "\n";
 		}
 		return str;
+	}
+
+	@Override
+	public void fire() {
+		for (Input a : in) {
+			a.fire();
+		}
+	}
+
+	@Override
+	public void backPropagate(double learningRate) {
+		// Do nothing
 	}
 
 }

@@ -2,6 +2,9 @@ package network;
 
 import java.util.ArrayList;
 
+import math.Function;
+import math.Sigmoid;
+
 public class Outputs implements Layer {
 
 	public static class Output implements Node {
@@ -9,13 +12,11 @@ public class Outputs implements Layer {
 		public double target;
 		private double value;
 		private ArrayList<Link> in = new ArrayList<Link>();
-		private long ID;
-		private String name;
+		private int ID;
 		private Function activation;
 
-		public Output(long ID, String name, Function act) {
+		public Output(int ID, Function act) {
 			this.ID = ID;
-			this.name = name;
 			if (act != null)
 				activation = act;
 			else
@@ -31,6 +32,23 @@ public class Outputs implements Layer {
 			value = activation.getResult();
 		}
 
+		public double getValue() {
+			return value;
+		}
+
+		@Override
+		public void backPropagate(double learningRate) {
+			// (dE/dO)*(dO/dSum)
+			double mult = (value - target) * activation.getGradient();
+			double grad = mult;
+			mult *= -learningRate;
+			for (Link a : in) {
+				a.weight = a.weight + mult * a.value;
+				// update gradient
+				a.gradient = grad;
+			}
+		}
+
 		@Override
 		public void connectToInput(Link l) {
 			in.add(l);
@@ -42,33 +60,60 @@ public class Outputs implements Layer {
 
 		@Override
 		public String toString() {
-			String str = "t" + Network.FORMAT.format(target) + ":v" + Network.FORMAT.format(value);
+			String str = "Output:"+ID+"\nt" + Network.FORMAT.format(target) + ":v" + Network.FORMAT.format(value);
 			return str;
 		}
 
 		@Override
-		public long getID() {
+		public int getID() {
 			return ID;
 		}
-		
+
 		@Override
-		public String getName() {
-			return name;
+		public int getNbrOutput() {
+			return 0;
+		}
+
+		@Override
+		public String[] getOutputLinkWeights() {
+			return new String[0];
 		}
 	}
 
 	private Output[] out;
 
-	public Outputs(IDFactory idFact, String[] names) {
-		out = new Output[names.length];
-		for (int i = 0; i < names.length; i++) {
-			out[i] = new Output(idFact.getID(), names[i], new Sigmoid());
+	public Outputs(int[] IDs) {
+		out = new Output[IDs.length];
+		for (int i = 0; i < IDs.length; i++) {
+			out[i] = new Output(IDs[i], new Sigmoid());
+		}
+	}
+
+	public Outputs(IDFactory idFact, int n) {
+		out = new Output[n];
+		for (int i = 0; i < n; i++) {
+			out[i] = new Output(idFact.getID(), new Sigmoid());
 		}
 	}
 
 	public void fire() {
 		for (Output a : out) {
 			a.fire();
+		}
+	}
+
+	@Override
+	public void backPropagate(double learningRate) {
+		for (Output a : out) {
+			a.backPropagate(learningRate);
+		}
+	}
+
+	public void setTarget(double[] vals) {
+		if (vals != null && vals.length == out.length) {
+			for (int i = 0; i < out.length; i++) {
+				out[i].target = vals[i];
+			}
 		}
 	}
 
@@ -81,7 +126,7 @@ public class Outputs implements Layer {
 	public String toString() {
 		String str = "";
 		for (int i = 0; i < out.length; i++) {
-			str += out[i].toString() + " ";
+			str += out[i].toString() + "\n";
 		}
 		return str;
 	}

@@ -2,14 +2,14 @@ package network;
 
 public class IDFactory {
 
-	private long idCount;
+	private int idCount;
 	
 	public IDFactory() {
 		idCount = 1;
 	}
 	
-	public synchronized long getID() {
-		long send = idCount;
+	public synchronized int getID() {
+		int send = idCount;
 		idCount++;
 		return send;
 	}
