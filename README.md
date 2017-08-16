@@ -1,2 +1,2 @@
 # AI
-Networks and stuff
+Neural networks and other fun stuff
